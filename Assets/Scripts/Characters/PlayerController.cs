@@ -48,6 +48,7 @@ public class PlayerController : MonoBehaviour
     {
         agent.isStopped = false;
         transform.LookAt(attackTarget.transform);
+        // todo: 距离这个值要根据后期更改武器来改变
         while(Vector3.Distance(attackTarget.transform.position, transform.position) > 1)
         {
             agent.destination = attackTarget.transform.position;
