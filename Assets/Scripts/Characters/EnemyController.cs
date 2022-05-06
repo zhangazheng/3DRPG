@@ -19,6 +19,8 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private float patrolRange;
     [SerializeField] private float lookAtTime;
     private float remainLookAtTime;
+    private float lastAttackTime;
+    private CharacterStats characterStats;
 
     private NavMeshAgent agent;
     private Animator anim;
@@ -34,6 +36,7 @@ public class EnemyController : MonoBehaviour
         speed = agent.speed;
         guardPos = transform.position;
         remainLookAtTime = lookAtTime;
+        characterStats = GetComponent<CharacterStats>();
     }
     // Start is called before the first frame update
     void Start()
@@ -53,12 +56,14 @@ public class EnemyController : MonoBehaviour
     {
         SwitchStates();
         SwitchAnimation();
+        lastAttackTime -= Time.deltaTime;
     }
     void SwitchAnimation()
     {
         anim.SetBool("Walk", isWalk);
         anim.SetBool("Chase", isChase);
         anim.SetBool("Follow", isFollow);
+        anim.SetBool("Critical", characterStats.isCritical);
     }
     void SwitchStates()
     {
@@ -122,12 +127,51 @@ public class EnemyController : MonoBehaviour
                 {
                     // ×·×Ùplayer
                     isFollow = true;
+                    agent.isStopped = false;
                     agent.destination = attackTarget.transform.position;
                 }
                 // ¹¥»÷
+                if(TargetInAttackRange() || TargetInSkillRange())
+                {
+                    isFollow = false;
+                    agent.isStopped = true;
+                    if(lastAttackTime < 0)
+                    {
+                        lastAttackTime = characterStats.attackData.collDown;
+                        // ±©»÷
+                        characterStats.isCritical = Random.value < characterStats.attackData.cirticalChance;
+                        Attack();
+                    }
+                }
                 break;
             case EnemyState.DEAD:
                 break;
+        }
+    }
+    bool TargetInAttackRange()
+    {
+        if (attackTarget != null)
+            return Vector3.Distance(attackTarget.transform.position, transform.position) <= characterStats.attackData.attackRange;
+        return false;
+    }
+    bool TargetInSkillRange()
+    {
+        if (attackTarget != null)
+            return Vector3.Distance(attackTarget.transform.position, transform.position) <= characterStats.attackData.skillRange;
+        return false;
+    }
+    void Attack()
+    {
+        transform.LookAt(attackTarget.transform);
+        if(TargetInAttackRange() )
+        {
+            // ½üÉí¹¥»÷¶¯»­
+            anim.SetTrigger("Attack");
+        }
+        if(TargetInSkillRange())
+        {
+            // Ô¶³Ì¹¥»÷¶¯»­
+            anim.SetTrigger("Skill");
         }
     }
     bool FoundPlayer()
@@ -156,5 +200,13 @@ public class EnemyController : MonoBehaviour
     {
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position, signtRadius);
+    }
+    void Hit()
+    {
+        if(attackTarget != null)
+        {
+            var targetStats = attackTarget.GetComponent<CharacterStats>();
+            targetStats.TakeDamage(characterStats, targetStats);
+        }
     }
 }

@@ -10,10 +10,12 @@ public class PlayerController : MonoBehaviour
     private Animator anim;
     private GameObject attackTarget;
     private float lastAttactTime;
+    private CharacterStats characterStats;
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
         anim = GetComponent<Animator>();
+        characterStats = GetComponent<CharacterStats>();
     }
     private void Start()
     {
@@ -41,6 +43,7 @@ public class PlayerController : MonoBehaviour
         if (target != null)
         {
             attackTarget = target;
+            characterStats.isCritical = UnityEngine.Random.value < characterStats.attackData.cirticalChance;
             StartCoroutine(MoveToAttactTarget());
         }
     }
@@ -48,8 +51,7 @@ public class PlayerController : MonoBehaviour
     {
         agent.isStopped = false;
         transform.LookAt(attackTarget.transform);
-        // todo: 距离这个值要根据后期更改武器来改变
-        while(Vector3.Distance(attackTarget.transform.position, transform.position) > 1)
+        while(Vector3.Distance(attackTarget.transform.position, transform.position) > characterStats.attackData.attackRange) 
         {
             agent.destination = attackTarget.transform.position;
             yield return null;
@@ -58,9 +60,16 @@ public class PlayerController : MonoBehaviour
         // attack
         if(lastAttactTime < 0)
         {
+            anim.SetBool("Critical", characterStats.isCritical);
             anim.SetTrigger("Attack");
+
             // 重置冷却时间
             lastAttactTime = 0.5f;
         }
+    }
+    void Hit()
+    {
+        var targetStats = attackTarget.GetComponent<CharacterStats>();
+        targetStats.TakeDamage(characterStats, targetStats);
     }
 }
