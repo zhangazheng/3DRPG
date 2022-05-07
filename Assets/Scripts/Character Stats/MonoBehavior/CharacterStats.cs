@@ -59,7 +59,6 @@ public class CharacterStats : MonoBehaviour
         {
             coreDamage *= attackData.criticalMultiplier;
         }
-        Debug.Log("±©»÷£º" + isCritical + coreDamage);
         return (int)coreDamage;
     }
     #endregion
