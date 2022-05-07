@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -9,7 +6,7 @@ public enum EnemyState
     GUARD, PATROL, CHASE, DEAD
 }
 [RequireComponent(typeof(NavMeshAgent))]
-public class EnemyController : MonoBehaviour
+public class EnemyController : MonoBehaviour, IEndGameObserver
 {
     // ºÏ≤‚ÕÊº“∑∂Œß
     [SerializeField] private float signtRadius;
@@ -27,14 +24,16 @@ public class EnemyController : MonoBehaviour
     private EnemyState enemyStates;
     private GameObject attackTarget;
     private float speed;
-    bool isWalk, isChase, isFollow;
+    bool isWalk, isChase, isFollow, isDeath, playerDeath;
     private Vector3 wayPoint, guardPos;
+    private Quaternion guardRotation;
     void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
         anim = GetComponent<Animator>();
         speed = agent.speed;
         guardPos = transform.position;
+        guardRotation = transform.rotation;
         remainLookAtTime = lookAtTime;
         characterStats = GetComponent<CharacterStats>();
     }
@@ -51,12 +50,27 @@ public class EnemyController : MonoBehaviour
         }
     }
 
+    void OnEnable()
+    {
+        GameManager.Instance.AddObserver(this);
+    }
+    void OnDisable()
+    {
+        GameManager.Instance.RemoveObserver(this);
+    }
     // Update is called once per frame
     void Update()
     {
-        SwitchStates();
-        SwitchAnimation();
-        lastAttackTime -= Time.deltaTime;
+        if(characterStats.CurrentHealth == 0)
+        {
+            isDeath = true;
+        }
+        if(!playerDeath)
+        {
+            SwitchStates();
+            SwitchAnimation();
+            lastAttackTime -= Time.deltaTime;
+        }
     }
     void SwitchAnimation()
     {
@@ -64,10 +78,15 @@ public class EnemyController : MonoBehaviour
         anim.SetBool("Chase", isChase);
         anim.SetBool("Follow", isFollow);
         anim.SetBool("Critical", characterStats.isCritical);
+        anim.SetBool("Death", isDeath);
     }
     void SwitchStates()
     {
-        if(FoundPlayer())
+        if(isDeath)
+        {
+            enemyStates = EnemyState.DEAD;
+        }
+        else if(FoundPlayer())
         {
             enemyStates = EnemyState.CHASE;
         }
@@ -75,6 +94,18 @@ public class EnemyController : MonoBehaviour
         switch(enemyStates)
         {
             case EnemyState.GUARD:
+                isChase = false;
+                if(transform.position != guardPos)
+                {
+                    isWalk = true;
+                    agent.isStopped = false;
+                    agent.destination = guardPos;
+                    transform.rotation = Quaternion.Lerp(transform.rotation, guardRotation, 0.1f);
+                    if(Vector3.SqrMagnitude(guardPos - transform.position) <= agent.stoppingDistance)
+                    {
+                        isWalk = false;
+                    }
+                }
                 break;
             case EnemyState.PATROL:
                 isChase = false;
@@ -139,12 +170,15 @@ public class EnemyController : MonoBehaviour
                     {
                         lastAttackTime = characterStats.attackData.collDown;
                         // ±©ª˜
-                        characterStats.isCritical = Random.value < characterStats.attackData.cirticalChance;
+                        characterStats.isCritical = UnityEngine.Random.value < characterStats.attackData.cirticalChance;
                         Attack();
                     }
                 }
                 break;
             case EnemyState.DEAD:
+                agent.enabled = false;
+                GetComponent<Collider>().enabled = false;
+                Destroy(gameObject, 2f);
                 break;
         }
     }
@@ -208,5 +242,17 @@ public class EnemyController : MonoBehaviour
             var targetStats = attackTarget.GetComponent<CharacterStats>();
             targetStats.TakeDamage(characterStats, targetStats);
         }
+    }
+
+    public void EndNotify()
+    {
+        // ªÒ §∂Øª≠
+        // Õ£÷πÀ˘”–“∆∂Ø
+        // Õ£÷πagent
+        anim.SetBool("Win", true);
+        isChase = false;
+        isWalk = false;
+        attackTarget = null;
+        playerDeath = true;
     }
 }

@@ -3,22 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-public class MouseManager : MonoBehaviour
+public class MouseManager : Singleton<MouseManager>
 {
-    public static MouseManager Instance;
     public event Action<Vector3> OnMouseClicked;
     public event Action<GameObject> OnEnemyClicked;
 
     [SerializeField] private Texture2D point, doorway, attact, target, arrow;
 
     RaycastHit hitInfo;
-    void Awake()
+    protected override void Awake()
     {
-        if (Instance != null)
-        {
-            Destroy(gameObject);
-        }
-        Instance = this;
+        base.Awake();
+        //DontDestroyOnLoad(this);
     }
     // Start is called before the first frame update
     void Start()
