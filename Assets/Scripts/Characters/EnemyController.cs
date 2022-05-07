@@ -6,6 +6,7 @@ public enum EnemyState
     GUARD, PATROL, CHASE, DEAD
 }
 [RequireComponent(typeof(NavMeshAgent))]
+[RequireComponent(typeof(CharacterStats))]
 public class EnemyController : MonoBehaviour, IEndGameObserver
 {
     // ¼ì²âÍæ¼Ò·¶Î§
