@@ -23,7 +23,7 @@ public class EnemyController : MonoBehaviour, IEndGameObserver
     private NavMeshAgent agent;
     private Animator anim;
     private EnemyState enemyStates;
-    private GameObject attackTarget;
+    protected GameObject attackTarget;
     private float speed;
     bool isWalk, isChase, isFollow, isDeath, playerDeath;
     private Vector3 wayPoint, guardPos;
@@ -180,8 +180,8 @@ public class EnemyController : MonoBehaviour, IEndGameObserver
                 }
                 break;
             case EnemyState.DEAD:
-                agent.enabled = false;
                 GetComponent<Collider>().enabled = false;
+                agent.radius = 0;
                 Destroy(gameObject, 2f);
                 break;
         }
