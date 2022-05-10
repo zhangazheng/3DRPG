@@ -51,6 +51,11 @@ public class CharacterStats : MonoBehaviour
         // TODO: update ui
         // TODO: ¾­Ñéupdate
     }
+    public void TakeDamage(int damage, CharacterStats defener)
+    {
+        int currentDamage = Mathf.Max(damage - defener.CurrentDefence, 0);
+        CurrentHealth = Mathf.Max(CurrentHealth - currentDamage, 0);
+    }
 
     private int CurrentDamage()
     {
