@@ -1,5 +1,35 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1151426580
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1151426581}
+  m_Layer: 7
+  m_Name: HealthBarPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1151426581
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1151426580}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1837562348934817804}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1842718974513975400
 GameObject:
   m_ObjectHideFlags: 0
@@ -853,6 +883,7 @@ GameObject:
   - component: {fileID: 1842268604141725952}
   - component: {fileID: 1842268604141725953}
   - component: {fileID: 1842268604141725954}
+  - component: {fileID: 5327139867364208820}
   m_Layer: 7
   m_Name: TurtleShell
   m_TagString: Enemy
@@ -867,12 +898,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1844094920001028662}
-  m_LocalRotation: {x: -0, y: -0.9734071, z: -0, w: 0.22908232}
+  m_LocalRotation: {x: 0, y: -0.97340727, z: 0, w: 0.22908145}
   m_LocalPosition: {x: 18.2, y: 0, z: 8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1837627499381955386}
   - {fileID: 1837825483819543712}
+  - {fileID: 1151426581}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: -153.514, z: 0}
@@ -923,7 +955,7 @@ MonoBehaviour:
   signtRadius: 6
   isGuard: 0
   patrolRange: 5
-  lookAtTime: 0
+  lookAtTime: 5
 --- !u!114 &1842268604141725953
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -962,6 +994,22 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &5327139867364208820
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1844094920001028662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3af1aaeb489722d4d9a301023fed5eae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthBarPrefab: {fileID: 8756509650586688758, guid: 711048008401c0c4e8864e27b946b8c1, type: 3}
+  barPoint: {fileID: 1151426581}
+  alwaysVisiable: 0
+  visiableTime: 3
 --- !u!1 &1844154338798574770
 GameObject:
   m_ObjectHideFlags: 0
