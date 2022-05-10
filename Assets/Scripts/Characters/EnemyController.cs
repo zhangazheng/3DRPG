@@ -18,7 +18,7 @@ public class EnemyController : MonoBehaviour, IEndGameObserver
     [SerializeField] private float lookAtTime;
     private float remainLookAtTime;
     private float lastAttackTime;
-    private CharacterStats characterStats;
+    protected CharacterStats characterStats;
 
     private NavMeshAgent agent;
     private Animator anim;
