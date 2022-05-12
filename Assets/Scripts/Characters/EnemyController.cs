@@ -104,9 +104,9 @@ public class EnemyController : MonoBehaviour, IEndGameObserver
                     isWalk = true;
                     agent.isStopped = false;
                     agent.destination = guardPos;
-                    transform.rotation = Quaternion.Lerp(transform.rotation, guardRotation, 0.1f);
                     if(Vector3.SqrMagnitude(guardPos - transform.position) <= agent.stoppingDistance)
                     {
+                        transform.rotation = Quaternion.Lerp(transform.rotation, guardRotation, 0.1f);
                         isWalk = false;
                     }
                 }
