@@ -4,15 +4,22 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.SceneManagement;
 
-public class SceneController : Singleton<SceneController>
+public class SceneController : Singleton<SceneController>, IEndGameObserver
 {
     [SerializeField] private GameObject playerPrefab;
     private GameObject player;
     NavMeshAgent playerAgent;
+    [SerializeField] private SceneFader fadePrefab;
+    bool fadeFinished;
     protected override void Awake()
     {
         base.Awake();
         DontDestroyOnLoad(this);
+        fadeFinished = true;
+    }
+    void Start()
+    {
+        GameManager.Instance.AddObserver(this);
     }
     public void TransitionToDestination(TransitionPoint transitionPoint)
     {
@@ -57,5 +64,47 @@ public class SceneController : Singleton<SceneController>
             }
         }
         return null;
+    }
+    public void TransitionToFirstLevel()
+    {
+        StartCoroutine(LoadLevel("Level1"));
+    }
+    public void TransitionToLoadGame()
+    {
+        StartCoroutine(LoadLevel(SaveManager.Instance.SceneName));
+    }
+    public void TransitionToMain()
+    {
+        StartCoroutine(LoadMain());
+    }
+    IEnumerator LoadLevel(string sceneName)
+    {
+        SceneFader fade = Instantiate(fadePrefab);
+        if (!string.IsNullOrEmpty(sceneName))
+        {
+            yield return StartCoroutine(fade.FadeOut(2.5f));
+            yield return SceneManager.LoadSceneAsync(sceneName);
+            yield return Instantiate(playerPrefab, GameManager.Instance.GetEntrance().position, GameManager.Instance.GetEntrance().rotation);
+            SaveManager.Instance.SavePlayerData();
+            yield return StartCoroutine(fade.FadeIn(2.5f));
+            yield break;
+        }
+    }
+    IEnumerator LoadMain()
+    {
+        SceneFader fade = Instantiate(fadePrefab);
+        yield return StartCoroutine(fade.FadeOut(2.5f));
+        yield return SceneManager.LoadSceneAsync("Main");
+        yield return StartCoroutine(fade.FadeIn(2.5f));
+        yield break;
+    }
+
+    public void EndNotify()
+    {
+        if(fadeFinished)
+        {
+            fadeFinished = false;
+            StartCoroutine(LoadMain());
+        }
     }
 }

@@ -22,8 +22,7 @@ public class PlayerController : MonoBehaviour
     }
     private void Start()
     {
-        // 将player character stats 注册到GameObject
-        GameManager.Instance.RegisterPlayer(characterStats);
+        SaveManager.Instance.LoadPlayerData();
     }
 
     private void Update()
@@ -38,6 +37,9 @@ public class PlayerController : MonoBehaviour
     }
     private void OnEnable()
     {
+        // 将player character stats 注册到GameObject
+        GameManager.Instance.RegisterPlayer(characterStats);
+
         MouseManager.Instance.OnMouseClicked += MoveToTarget;
         MouseManager.Instance.OnEnemyClicked += EventAttact;
     }
