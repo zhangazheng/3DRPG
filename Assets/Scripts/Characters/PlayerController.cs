@@ -22,8 +22,6 @@ public class PlayerController : MonoBehaviour
     }
     private void Start()
     {
-        MouseManager.Instance.OnMouseClicked += (v) => MoveToTarget(v);
-        MouseManager.Instance.OnEnemyClicked += (v) => EventAttact(v);
         // ½«player character stats ×¢²áµ½GameObject
         GameManager.Instance.RegisterPlayer(characterStats);
     }
@@ -37,6 +35,17 @@ public class PlayerController : MonoBehaviour
         }
         SwitchAnimation();
         lastAttactTime -= Time.deltaTime;
+    }
+    private void OnEnable()
+    {
+        MouseManager.Instance.OnMouseClicked += MoveToTarget;
+        MouseManager.Instance.OnEnemyClicked += EventAttact;
+    }
+    private void OnDisable()
+    {
+        if (!MouseManager.IsInitialized) return;
+        MouseManager.Instance.OnMouseClicked -= MoveToTarget;
+        MouseManager.Instance.OnEnemyClicked -= EventAttact;
     }
     void SwitchAnimation()
     {

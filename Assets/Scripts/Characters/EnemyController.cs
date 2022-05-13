@@ -49,7 +49,6 @@ public class EnemyController : MonoBehaviour, IEndGameObserver
             enemyStates = EnemyState.PATROL;
             GetNewWayPoint();
         }
-        // todo fix 切换场景后修改为OnEnable
         GameManager.Instance.AddObserver(this);
     }
     // 切换场景时启用
